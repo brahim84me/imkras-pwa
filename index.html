@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>تقرير الليالي</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@500;700;800&family=Tajawal:wght@400;500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-primary:#0E1A2B;
+    --bg-panel:#16243B;
+    --bg-panel-light:#1E3050;
+    --bg-input:#0F1E33;
+    --accent:#E8A33D;
+    --accent-dim:#B87F2A;
+    --accent-glow:rgba(232,163,61,.18);
+    --text-primary:#EEF1F6;
+    --text-secondary:#7E92B0;
+    --text-faint:#4E617F;
+    --border:#26395A;
+    --danger:#E0645B;
+    --success:#4FAE83;
+    --warning:#D4A03A;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg-primary);}
+  #app{
+    font-family:'Tajawal',sans-serif;
+    color:var(--text-primary);
+    max-width:480px;
+    margin:0 auto;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 85% -10%, rgba(232,163,61,.07), transparent 45%),
+      var(--bg-primary);
+    display:flex;
+    flex-direction:column;
+    position:relative;
+  }
+  header.top{
+    padding:22px 20px 16px;
+    border-bottom:1px solid var(--border);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .brand{display:flex;flex-direction:column;gap:2px;}
+  .brand .mark{
+    font-family:'Cairo',sans-serif;
+    font-weight:800;
+    font-size:19px;
+    letter-spacing:.2px;
+  }
+  .brand .mark span{color:var(--accent);}
+  .brand .sub{font-size:12px;color:var(--text-secondary);}
+  .clock{
+    font-family:'JetBrains Mono',monospace;
+    font-size:13px;
+    color:var(--accent);
+    background:var(--accent-glow);
+    border:1px solid rgba(232,163,61,.35);
+    padding:5px 10px;
+    border-radius:7px;
+    white-space:nowrap;
+  }
+  main{flex:1;padding:18px 18px 100px;overflow-y:auto;}
+  .card{
+    background:var(--bg-panel);
+    border:1px solid var(--border);
+    border-radius:14px;
+    padding:16px;
+    margin-bottom:14px;
+  }
+  .card h2{
+    font-family:'Cairo',sans-serif;
+    font-size:14px;
+    font-weight:700;
+    margin:0 0 12px;
+    color:var(--text-primary);
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .card h2 .idx{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--accent);
+    border:1px solid rgba(232,163,61,.4);
+    border-radius:5px;
+    padding:1px 6px;
+  }
+  label{display:block;font-size:12.5px;color:var(--text-secondary);margin-bottom:6px;}
+  input[type=text],input[type=date],input[type=number],input[type=tel],select,textarea{
+    width:100%;
+    background:var(--bg-input);
+    border:1px solid var(--border);
+    color:var(--text-primary);
+    border-radius:9px;
+    padding:11px 12px;
+    font-family:'Tajawal',sans-serif;
+    font-size:14.5px;
+    outline:none;
+    transition:border-color .15s;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);}
+  textarea{resize:vertical;min-height:90px;line-height:1.6;}
+  .row-gap{margin-bottom:12px;}
+  .supervisor-suggest{
+    font-size:12px;color:var(--text-faint);margin-top:6px;
+  }
+  .supervisor-suggest b{color:var(--accent);font-weight:700;}
+  .center-row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:9px 0;
+    border-bottom:1px solid var(--border);
+  }
+  .center-row:last-child{border-bottom:none;}
+  .center-row .name{flex:1;font-size:14px;color:var(--text-primary);}
+  .center-row input{
+    width:64px;
+    text-align:center;
+    font-family:'JetBrains Mono',monospace;
+    font-weight:700;
+    padding:8px 4px;
+    flex-shrink:0;
+  }
+  .total-line{
+    display:flex;justify-content:space-between;align-items:center;
+    margin-top:10px;padding-top:10px;border-top:1px dashed var(--border);
+    font-size:13px;color:var(--text-secondary);
+  }
+  .total-line .num{
+    font-family:'JetBrains Mono',monospace;font-weight:700;
+    color:var(--accent);font-size:16px;
+  }
+  button, .btn-link{
+    font-family:'Cairo',sans-serif;
+    font-weight:700;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    font-size:14.5px;
+    transition:transform .08s, opacity .15s;
+    text-align:center;
+    display:block;
+    width:100%;
+  }
+  button:active, .btn-link:active{transform:scale(.97);}
+  .btn-primary{
+    background:var(--accent);
+    color:#1A1305;
+    padding:14px;
+  }
+  .btn-secondary{
+    background:var(--bg-panel-light);
+    color:var(--text-primary);
+    border:1px solid var(--border);
+    padding:12px;
+  }
+  .btn-ghost{
+    background:transparent;
+    color:var(--text-secondary);
+    padding:8px 10px;
+    font-size:12.5px;
+    border:1px solid var(--border);
+    border-radius:8px;
+  }
+  .btn-whatsapp{
+    display:block;width:100%;background:#25D366;color:#06210F;
+    padding:13px;border-radius:10px;text-align:center;text-decoration:none;
+    font-family:'Cairo',sans-serif;font-weight:700;font-size:14.5px;
+  }
+  .btn-danger{
+    background:var(--danger);
+    color:#fff;
+    padding:12px;
+  }
+  .btn-row{
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    margin-top:4px;
+  }
+  .btn-row .btn-half{
+    width:100%;
+  }
+  nav.tabs{
+    position:sticky;bottom:0;
+    max-width:480px;margin:0 auto;
+    display:flex;
+    background:var(--bg-panel);
+    border-top:1px solid var(--border);
+    padding:8px 10px calc(8px + env(safe-area-inset-bottom));
+    gap:6px;
+  }
+  nav.tabs button{
+    flex:1;background:transparent;color:var(--text-faint);
+    padding:9px 4px;font-size:12px;display:flex;flex-direction:column;
+    align-items:center;gap:3px;
+  }
+  nav.tabs button.active{color:var(--accent);}
+  nav.tabs button .dot{
+    width:5px;height:5px;border-radius:50%;background:transparent;
+  }
+  nav.tabs button.active .dot{background:var(--accent);}
+  .empty{
+    text-align:center;color:var(--text-faint);font-size:13px;
+    padding:30px 10px;
+  }
+  .report-item{
+    background:var(--bg-panel-light);border:1px solid var(--border);
+    border-radius:11px;padding:13px;margin-bottom:10px;
+  }
+  .report-item .rh{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+  .report-item .rdate{font-family:'JetBrains Mono',monospace;font-size:12.5px;color:var(--accent);font-weight:700;}
+  .report-item .rsup{font-size:13px;color:var(--text-primary);font-weight:700;font-family:'Cairo',sans-serif;}
+  .report-item .rmeta{font-size:11.5px;color:var(--text-secondary);margin-bottom:8px;}
+  .report-item .rtext{font-size:13px;line-height:1.7;color:var(--text-primary);white-space:pre-wrap;margin-bottom:8px;}
+  .chip-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;}
+  .chip{
+    font-family:'JetBrains Mono',monospace;font-size:11px;
+    background:var(--bg-input);border:1px solid var(--border);
+    border-radius:6px;padding:3px 7px;color:var(--text-secondary);
+  }
+  .chip b{color:var(--text-primary);}
+
+  .report-actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+    padding-top:8px;
+    border-top:1px solid var(--border);
+  }
+  .btn-act{
+    flex:1;
+    padding:6px 8px;
+    font-size:11.5px;
+    border-radius:6px;
+    border:1px solid var(--border);
+    background:var(--bg-input);
+    color:var(--text-primary);
+  }
+  .btn-act-whatsapp{
+    color:#25D366;
+    border-color:rgba(37,211,102,.35);
+  }
+  .btn-act-danger{
+    color:var(--danger);
+    border-color:rgba(224,100,91,0.3);
+  }
+
+  .toast{
+    position:fixed;bottom:90px;left:50%;transform:translateX(-50%);
+    background:var(--success);color:#08251A;font-family:'Cairo',sans-serif;
+    font-weight:700;font-size:13px;padding:10px 18px;border-radius:10px;
+    z-index:50;opacity:0;pointer-events:none;transition:opacity .25s, bottom .25s;
+    max-width:90%;text-align:center;
+  }
+  .toast.warn{background:var(--warning);color:#1A1200;}
+  .toast.danger{background:var(--danger);color:#fff;}
+  .toast.show{opacity:1;bottom:105px;}
+  .settings-item{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+  .settings-item input{flex:1;}
+  .small-btn{
+    background:var(--bg-input);color:var(--text-secondary);
+    border:1px solid var(--border);border-radius:8px;
+    width:34px;height:34px;flex-shrink:0;font-size:16px;
+  }
+  .add-row{display:flex;gap:8px;margin-top:4px;}
+  .add-row input{flex:1;}
+  .add-row button{width:44px;background:var(--accent);color:#1A1305;border-radius:9px;font-size:18px;}
+  .hint{font-size:11.5px;color:var(--text-faint);margin-top:6px;line-height:1.6;}
+  .loading{text-align:center;padding:40px 0;color:var(--text-faint);font-size:13px;}
+  .overlay{
+    position:fixed;inset:0;background:rgba(6,11,20,.72);
+    display:flex;align-items:flex-end;justify-content:center;
+    z-index:80;
+  }
+  .overlay .sheet{
+    width:100%;max-width:480px;background:var(--bg-panel);
+    border-top:1px solid var(--border);
+    border-radius:18px 18px 0 0;
+    padding:18px 18px calc(18px + env(safe-area-inset-bottom));
+    max-height:85vh;overflow-y:auto;
+  }
+  .sheet .sheet-title{
+    font-family:'Cairo',sans-serif;font-weight:700;font-size:15px;margin-bottom:4px;
+  }
+  .sheet textarea.reportPreview{
+    width:100%;min-height:220px;background:var(--bg-input);
+    border:1px solid var(--border);border-radius:10px;color:var(--text-primary);
+    padding:12px;font-size:13.5px;line-height:1.8;font-family:'Tajawal',sans-serif;margin-bottom:12px;
+  }
+  .sync-btn{
+    background:var(--bg-input);color:var(--text-secondary);
+    border:1px solid var(--border);border-radius:8px;
+    padding:6px 12px;font-size:12px;font-family:'Cairo',sans-serif;
+    cursor:pointer;
+  }
+  .sync-btn:active{transform:scale(.97);}
+  .pending-badge{
+    font-size:11px;color:var(--danger);background:rgba(224,100,91,.12);
+    border:1px solid rgba(224,100,91,.3);border-radius:6px;padding:3px 8px;
+    margin-bottom:10px;display:inline-block;
+  }
+  .required-label::after{
+    content:' *';
+    color:var(--danger);
+  }
+  .field-error{
+    border-color:var(--danger) !important;
+    box-shadow:0 0 0 1px var(--danger);
+  }
+</style>
+<base target="_blank">
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#07111f">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="إمكراس">
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <div class="brand">
+      <div class="mark">تقرير <span>الليالي</span></div>
+      <div class="sub" id="dateSub">—</div>
+    </div>
+    <div class="clock" id="clock">--:--</div>
+  </header>
+
+  <main id="main"><div class="loading">جاري المزامنة مع السحابة…</div></main>
+
+  <div class="toast" id="toast"></div>
+  <div id="shareOverlayRoot"></div>
+
+  <nav class="tabs">
+    <button data-tab="report" class="active"><span>تقرير الليلة</span><span class="dot"></span></button>
+    <button data-tab="history"><span>السجل</span><span class="dot"></span></button>
+    <button data-tab="settings"><span>الإعدادات</span><span class="dot"></span></button>
+  </nav>
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbwVSL77s1GhIYnFLN2feso7y52pi9Pr6NfoCK-43VLF3x8Z1pwrVT6wThlYVeAKmqKkAA/exec";
+
+let state = {
+  centers: Array.from({length:14}, (_,i)=>({id: (i+1).toString(), name:'مركز '+(i+1)})),
+  supervisors: [],
+  rotationStart: todayISO(),
+  adminPin: null,
+  adminUnlocked: false,
+  reports: [],
+  activeTab: 'report',
+  draft: { count: {}, date: todayISO(), supervisor: '', text: '' },
+  pendingDeletes: new Set(),
+  pendingSync: [],
+  lsAvailable: false
+};
+
+/* ═══════════════════════════════════════════════
+   localStorage helpers for permanent delete
+   ═══════════════════════════════════════════════ */
+
+
+function saveLocalReports(){
+  if(!state.lsAvailable) return;
+  try {
+    localStorage.setItem('reports_v3', JSON.stringify(state.reports));
+  } catch(e) {
+    console.error('LOCAL_REPORTS_SAVE_ERROR', e);
+  }
+}
+
+function loadLocalReports(){
+  if(!state.lsAvailable) return;
+  try {
+    const raw = localStorage.getItem('reports_v3');
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr)){
+        state.reports = arr.map(sanitizeReport);
+      }
+    }
+  } catch(e) {
+    console.error('LOCAL_REPORTS_LOAD_ERROR', e);
+  }
+}
+
+function savePendingSync(){
+  if(!state.lsAvailable) return;
+  try {
+    localStorage.setItem('pendingSync_v3', JSON.stringify(state.pendingSync));
+  } catch(e) {
+    console.error('PENDING_SYNC_SAVE_ERROR', e);
+  }
+}
+
+function loadPendingSync(){
+  if(!state.lsAvailable) return;
+  try {
+    const raw = localStorage.getItem('pendingSync_v3');
+    if(raw){
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr)){
+        state.pendingSync = arr;
+      }
+    }
+  } catch(e) {
+    console.error('PENDING_SYNC_LOAD_ERROR', e);
+  }
+}
+
+function queueSync(action, data){
+  if(action === 'saveReport' && data && data.id){
+    state.pendingSync = state.pendingSync.filter(function(x){
+      return !(x.action === 'saveReport' &&
+               x.data &&
+               x.data.id === data.id);
+    });
+  }
+
+  if(action === 'deleteReport' && data && data.id){
+    state.pendingSync = state.pendingSync.filter(function(x){
+      return !(x.data && x.data.id === data.id);
+    });
+  }
+
+  state.pendingSync.push({
+    action: action,
+    data: data,
+    queuedAt: Date.now()
+  });
+
+  savePendingSync();
+}
+
+async function syncPendingOperations(){
+  if(!API_URL || state.pendingSync.length === 0) return;
+
+  const queue = state.pendingSync.slice();
+
+  for(const item of queue){
+    try {
+      const result = await postToCloud(item.action, item.data);
+
+      if(result && result.status === 'success'){
+
+        const index = state.pendingSync.findIndex(function(x){
+          return x.queuedAt === item.queuedAt;
+        });
+
+        if(index !== -1){
+          state.pendingSync.splice(index, 1);
+          savePendingSync();
+        }
+
+        if(item.action === 'saveReport' &&
+           item.data &&
+           item.data.id){
+
+          const report = state.reports.find(function(x){
+            return x.id === item.data.id;
+          });
+
+          if(report){
+            if(result.sentDate) report.date = result.sentDate;
+            if(result.sentDay) report.sentDay = result.sentDay;
+            if(result.sentTime) report.sentTime = result.sentTime;
+            saveLocalReports();
+          }
+        }
+
+      } else {
+        break;
+      }
+
+    } catch(e) {
+      console.error('PENDING_SYNC_ERROR', e);
+      break;
+    }
+  }
+}
+
+async function autoSync(){
+  if(!navigator.onLine) return;
+
+  try {
+    await syncPendingOperations();
+    await syncFromCloud();
+    saveLocalReports();
+  } catch(e) {
+    console.error('AUTO_SYNC_ERROR', e);
+  }
+}
+
+function checkLocalStorage(){
+  try {
+    const testKey = '__ls_test__';
+    localStorage.setItem(testKey, '1');
+    localStorage.removeItem(testKey);
+    state.lsAvailable = true;
+    return true;
+  } catch(e) {
+    state.lsAvailable = false;
+    return false;
+  }
+}
+
+function loadPendingDeletes(){
+  if(!state.lsAvailable) return;
+  try {
+    const raw = localStorage.getItem('pendingDeletes_v2');
+    if(raw) {
+      const arr = JSON.parse(raw);
+      if(Array.isArray(arr)){
+        state.pendingDeletes = new Set(arr);
+      }
+    }
+  } catch(e) { console.error(e); }
+}
+
+function savePendingDeletes(){
+  if(!state.lsAvailable) return;
+  try {
+    localStorage.setItem('pendingDeletes_v2', JSON.stringify([...state.pendingDeletes]));
+  } catch(e) { console.error(e); }
+}
+
+function clearPendingDelete(id){
+  state.pendingDeletes.delete(id);
+  savePendingDeletes();
+}
+
+function addPendingDelete(id){
+  state.pendingDeletes.add(id);
+  savePendingDeletes();
+}
+
+/* ═══════════════════════════════════════════════
+   دوال الوقت والتاريخ
+   ═══════════════════════════════════════════════ */
+
+function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,'0');
+  const day = String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+
+function nowTimeString(){
+  const d = new Date();
+  const h = String(d.getHours()).padStart(2,'0');
+  const min = String(d.getMinutes()).padStart(2,'0');
+  const s = String(d.getSeconds()).padStart(2,'0');
+  return `${h}:${min}:${s}`;
+}
+
+function formatArabicDate(iso){
+  if(!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  if(isNaN(d.getTime())) return iso;
+  return d.toLocaleDateString('ar-EG-u-nu-latn',{weekday:'long', year:'numeric', month:'long', day:'numeric'});
+}
+
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,7); }
+
+/* ═══════════════════════════════════════════════
+   تصحيح التاريخ/الوقت القادم من السحابة
+   (Google Sheets يحوّل أحياناً "YYYY-MM-DD" إلى
+   Date كامل، فيعود كنص ISO مع فارق يوم بسبب التوقيت)
+   ═══════════════════════════════════════════════ */
+
+function normalizeDate(v){
+  if(!v || typeof v !== 'string') return v;
+  const plain = v.match(/^(\d{4}-\d{2}-\d{2})$/);
+  if(plain) return plain[1];
+
+  // Google Sheets may return the date as an ISO timestamp.
+  // Keep ONLY the date part exactly as stored; never shift it by timezone.
+  const iso = v.match(/^(\d{4}-\d{2}-\d{2})T/);
+  if(iso) return iso[1];
+
+  return v;
+}
+
+function isPlainTimeString(v){
+  return typeof v === 'string' && /^\d{1,2}:\d{2}(:\d{2})?$/.test(v);
+}
+function isPlainDayString(v){
+  return typeof v === 'string' && v.length > 0 && !v.includes('T') && !/^\d/.test(v);
+}
+
+function sanitizeReport(r){
+  if(!r) return r;
+  return {
+    ...r,
+    date: normalizeDate(r.date),
+    sentTime: isPlainTimeString(r.sentTime) ? r.sentTime : undefined,
+    sentDay: isPlainDayString(r.sentDay) ? r.sentDay : undefined
+  };
+}
+
+function showToast(msg, type='success'){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+
+function tickClock(){
+  const el = document.getElementById('clock');
+  const now = new Date();
+  el.textContent = now.toLocaleTimeString('ar-EG-u-nu-latn',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  document.getElementById('dateSub').textContent = formatArabicDate(todayISO());
+}
+setInterval(tickClock, 1000);
+
+function getTodaysSupervisor(){
+  if(!state.supervisors || state.supervisors.length===0) return '';
+  if(!state.rotationStart) return state.supervisors[0].name;
+  const start = new Date(state.rotationStart+'T12:00:00');
+  const now = new Date(todayISO()+'T12:00:00');
+  const diffDays = Math.round((now - start) / 86400000);
+  const n = state.supervisors.length;
+  const idx = ((diffDays % n) + n) % n;
+  return state.supervisors[idx].name;
+}
+
+/* ═══════════════════════════════════════════════
+   المزامنة مع السحابة — مُحسّنة
+   ═══════════════════════════════════════════════ */
+
+async function syncFromCloud(){
+  if(!API_URL || API_URL.includes("ضع_رابط")) return;
+  try {
+    const url = API_URL + "?action=getData&t=" + Date.now();
+    const res = await fetch(url);
+    const data = await res.json();
+
+    if(data.settings){
+      if(data.settings.centers) state.centers = data.settings.centers;
+      if(data.settings.supervisors) state.supervisors = data.settings.supervisors;
+      if(data.settings.rotationStart) state.rotationStart = data.settings.rotationStart;
+      if(data.settings.adminPin) state.adminPin = data.settings.adminPin;
+    }
+
+    if(data.reports){
+      // تنظيف بيانات السحابة: تحويل التاريخ إلى YYYY-MM-DD فقط،
+      // وعدم استخدام أي timestamp رقمي لتحديد تاريخ التقرير.
+      const cloudReports = data.reports.map(sanitizeReport);
+      const cloudIds = new Set(cloudReports.map(r => r.id));
+      const localOnly = state.reports.filter(r => !cloudIds.has(r.id) && !state.pendingDeletes.has(r.id));
+      const merged = [...cloudReports, ...localOnly].filter(r => !state.pendingDeletes.has(r.id));
+      const map = new Map();
+      merged.forEach(r => {
+        const existing = map.get(r.id);
+        if(!existing || (r.timestamp && existing.timestamp && r.timestamp > existing.timestamp)){
+          map.set(r.id, r);
+        }
+      });
+      state.reports = Array.from(map.values());
+    }
+
+    await retryPendingDeletes();
+
+  } catch(e) {
+    console.error("فشل الجلب السحابي", e);
+  }
+}
+
+async function retryPendingDeletes(){
+  if(!API_URL || API_URL.includes("ضع_رابط")) return;
+  if(state.pendingDeletes.size === 0) return;
+
+  const ids = [...state.pendingDeletes];
+  let successCount = 0;
+
+  for(const id of ids){
+    try {
+      const ok = await postToCloud("deleteReport", { id: id });
+      if(ok && ok.status === "success"){
+        state.pendingDeletes.delete(id);
+        successCount++;
+      }
+    } catch(e) {
+      console.error("فشل حذف معلق:", id, e);
+    }
+  }
+
+  if(successCount > 0){
+    savePendingDeletes();
+    showToast('تم مزامنة ' + successCount + ' حذف معلق بالسحابة');
+    if(state.activeTab === 'history'){
+      await renderHistoryTab();
+    }
+  }
+}
+
+async function postToCloud(action, dataObj){
+  if(!API_URL || API_URL.includes("ضع_رابط")) return {status:"error"};
+  try {
+    const url = API_URL + "?action=" + action + "&data=" + encodeURIComponent(JSON.stringify(dataObj));
+    const res = await fetch(url);
+    const resData = await res.json();
+    return resData;
+  } catch(e) {
+    console.error("فشل الإرسال السحابي", e);
+    return {status:"error"};
+  }
+}
+
+async function syncSettingsToCloud(){
+  const settingsObj = {
+    centers: state.centers,
+    supervisors: state.supervisors,
+    rotationStart: state.rotationStart,
+    adminPin: state.adminPin
+  };
+  return await postToCloud("saveSettings", settingsObj);
+}
+
+/* ═══════════════════════════════════════════════
+   تبويب التقرير — 3 أزرار + شرط إلزامي
+   ═══════════════════════════════════════════════ */
+
+function renderReportTab(){
+  const suggested = getTodaysSupervisor();
+  const total = state.centers.reduce((s,c)=> s + (parseInt(state.draft.count[c.id])||0), 0);
+
+  const supervisorOptions = state.supervisors.map(s=>
+    `<option value="${s.name}" ${state.draft.supervisor===s.name?'selected':''}>${s.name}</option>`
+  ).join('');
+
+  const centersHtml = state.centers.map(c => `
+    <div class="center-row">
+      <div class="name">${c.name}</div>
+      <input type="number" min="0" inputmode="numeric" data-center="${c.id}"
+             value="${state.draft.count[c.id] ?? ''}" placeholder="0" class="count-input">
+    </div>
+  `).join('');
+
+  return `
+    <div class="card" style="border-color:var(--success);padding:10px 14px;">
+      <span style="color:var(--success);font-size:12.5px;">✓ متزامن سحابياً مع Google Sheets</span>
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">١</span> التاريخ</h2>
+      <input type="date" id="reportDate" value="${state.draft.date}">
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">٢</span> مسؤولي الليالي</h2>
+      ${state.supervisors.length ? `
+        <select id="supervisorSelect">
+          <option value="">— اختر —</option>
+          ${supervisorOptions}
+        </select>
+        ${suggested ? `<div class="supervisor-suggest">مقترح بحسب الدورة: <b>${suggested}</b></div>` : ''}
+      ` : `
+        <input type="text" id="supervisorFree" placeholder="اسم مسؤولي الليالي" value="${state.draft.supervisor}">
+      `}
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">٣</span> عدد الحضور</h2>
+      ${centersHtml}
+      <div class="total-line">
+        <span>الإجمالي</span>
+        <span class="num">${total}</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="idx">٤</span> تقرير الليلة <span style="color:var(--danger);font-size:12px;">(إلزامي)</span></h2>
+      <textarea id="reportText" placeholder="اكتب ملاحظات الليلة هنا… لا يمكن الإرسال بدون كتابة التقرير">${state.draft.text}</textarea>
+      <div class="hint" id="reportHint" style="display:none;color:var(--danger);font-size:12px;">⚠️ يجب كتابة تقرير الليلة قبل الحفظ أو الإرسال</div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn-whatsapp" id="whatsappBtn">📱 حفظ وإرسال إلى واتساب</button>
+      <button class="btn-secondary" id="closeFormBtn">❌ إغلاق / مسح النموذج</button>
+    </div>
+  `;
+}
+
+function bindReportTab(){
+  document.getElementById('reportDate').addEventListener('change', e=> state.draft.date = e.target.value);
+  const sel = document.getElementById('supervisorSelect');
+  if(sel) sel.addEventListener('change', e=> state.draft.supervisor = e.target.value);
+  const free = document.getElementById('supervisorFree');
+  if(free) free.addEventListener('input', e=> state.draft.supervisor = e.target.value);
+
+  document.querySelectorAll('.count-input').forEach(inp=>{
+    inp.addEventListener('input', e=>{
+      state.draft.count[e.target.dataset.center] = e.target.value;
+      const total = state.centers.reduce((s,c)=> s + (parseInt(state.draft.count[c.id])||0), 0);
+      document.querySelector('.total-line .num').textContent = total;
+    });
+  });
+  document.getElementById('reportText').addEventListener('input', e=>{
+    state.draft.text = e.target.value;
+    const hint = document.getElementById('reportHint');
+    const ta = document.getElementById('reportText');
+    if(hint) hint.style.display = 'none';
+    if(ta) ta.classList.remove('field-error');
+  });
+
+  document.getElementById('closeFormBtn').addEventListener('click', clearForm);
+  document.getElementById('whatsappBtn').addEventListener('click', (e)=>{
+    e.preventDefault();
+    submitReport(true);
+  });
+}
+
+function clearForm(){
+  state.draft = { count: {}, date: todayISO(), supervisor: getTodaysSupervisor(), text: '' };
+  render();
+  showToast('تم مسح النموذج');
+}
+
+function validateReportText(){
+  const text = (state.draft.text || '').trim();
+  const ta = document.getElementById('reportText');
+  const hint = document.getElementById('reportHint');
+  if(!text){
+    if(ta) ta.classList.add('field-error');
+    if(hint) hint.style.display = 'block';
+    showToast('يجب كتابة تقرير الليلة أولاً', 'warn');
+    return false;
+  }
+  if(ta) ta.classList.remove('field-error');
+  if(hint) hint.style.display = 'none';
+  return true;
+}
+
+function getReportFromDraft(){
+  if(!state.draft.date){ showToast('الرجاء تحديد التاريخ', 'warn'); return null; }
+  if(!state.draft.supervisor){ showToast('الرجاء تحديد المسؤول', 'warn'); return null; }
+  if(!validateReportText()) return null;
+
+  const centersData = state.centers.map(c=>({
+    name: c.name,
+    count: parseInt(state.draft.count[c.id]) || 0
+  }));
+  const total = centersData.reduce((s,c)=>s+c.count,0);
+
+  // لحظة الإرسال الفعلية من جهاز المستخدم.
+  // نحفظ التاريخ والوقت فقط، بدون Unix timestamp رقمي.
+  const sentAt = new Date();
+  const sentDate = todayISO();
+
+  return {
+    id: uid(),
+    date: sentDate,
+    supervisor: state.draft.supervisor,
+    centers: centersData,
+    total,
+    text: state.draft.text.trim(),
+    sentTime: sentAt.toLocaleTimeString('ar-EG-u-nu-latn',{
+      hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
+    }),
+    sentDay: sentAt.toLocaleDateString('ar-EG-u-nu-latn',{weekday:'long'})
+  };
+}
+
+async function submitReport(){
+  const report = getReportFromDraft();
+  if(!report) return;
+
+  const btn = document.getElementById('whatsappBtn');
+  const originalText = btn.textContent;
+
+  btn.style.pointerEvents = 'none';
+  btn.style.opacity = '0.7';
+  btn.textContent = "جاري الحفظ…";
+
+  // حفظ التقرير محلياً فوراً
+  state.reports.push(sanitizeReport(report));
+  saveLocalReports();
+
+  // وضع عملية الحفظ في قائمة المزامنة
+  queueSync("saveReport", report);
+
+  // محاولة المزامنة مباشرة إذا كان الإنترنت متوفراً
+  let synced = false;
+
+  if(navigator.onLine){
+    try{
+      await syncPendingOperations();
+
+      synced = !state.pendingSync.some(function(x){
+        return x.action === "saveReport" &&
+               x.data &&
+               x.data.id === report.id;
+      });
+
+    }catch(e){
+      console.error("SUBMIT_SYNC_ERROR", e);
+    }
+  }
+
+  // استخدام النسخة المحلية بعد المزامنة
+  const finalReport =
+    state.reports.find(function(r){
+      return r.id === report.id;
+    }) || report;
+
+  // فتح واتساب
+  const text = buildReportMessage(finalReport);
+  const url = "https://wa.me/?text=" + encodeURIComponent(text);
+  window.open(url, '_blank');
+
+  if(synced){
+    showToast('تم حفظ التقرير ومزامنته وفتح واتساب ✓');
+  }else{
+    showToast('تم حفظ التقرير على الهاتف، وسيتم إرساله تلقائياً عند عودة الإنترنت', 'warn');
+  }
+
+  // تنظيف النموذج
+  state.draft.count = {};
+  state.draft.text = '';
+
+  render();
+
+  btn.style.pointerEvents = '';
+  btn.style.opacity = '';
+  btn.textContent = originalText;
+}
+
+/* ═══════════════════════════════════════════════
+   تبويب السجل — حذف دائم + واتساب + مزامنة ذكية
+   ═══════════════════════════════════════════════ */
+
+async function renderHistoryTab(){
+  document.getElementById('main').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--text-faint);">آخر تحديث: ${nowTimeString()}</span>
+      <button class="sync-btn" id="refreshHistory">🔄 تحديث</button>
+    </div>
+    <div class="loading">جاري تحديث السجل المشترك…</div>
+  `;
+
+  await syncFromCloud();
+
+  if(state.reports.length === 0){
+    document.getElementById('main').innerHTML = `
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+        <span style="font-size:12px;color:var(--text-faint);">آخر تحديث: ${nowTimeString()}</span>
+        <button class="sync-btn" id="refreshHistory">🔄 تحديث</button>
+      </div>
+      <div class="empty">لا توجد تقارير متزامنة بعد.</div>
+    `;
+    bindHistoryRefresh();
+    return;
+  }
+
+  const reportsSorted = [...state.reports].sort((a,b) => {
+    const ta = `${normalizeDate(a.date)||''} ${a.sentTime||''}`;
+    const tb = `${normalizeDate(b.date)||''} ${b.sentTime||''}`;
+    return tb.localeCompare(ta);
+  });
+
+  const pendingCount = state.pendingDeletes.size;
+  const pendingBadge = pendingCount > 0
+    ? `<div class="pending-badge">⚠️ ${pendingCount} تقرير محذوف محلياً في انتظار المزامنة مع السحابة</div>`
+    : '';
+
+  const html = reportsSorted.map(r=>{
+    const chips = (r.centers||[]).filter(c=>c.count>0).map(c=>`<span class="chip"><b>${c.count}</b> ${c.name}</span>`).join('');
+    const sentMeta = (r.sentDay || r.sentTime)
+      ? `<div class="rmeta">⏱️ أُرسل يوم ${r.sentDay || ''}${r.sentTime ? ' — الساعة ' + r.sentTime : ''}</div>`
+      : '';
+    return `
+      <div class="report-item" data-report-id="${r.id}">
+        <div class="rh">
+          <span class="rdate">${r.date}</span>
+        </div>
+        <div class="rsup">${r.supervisor} — إجمالي ${r.total}</div>
+        <div class="rmeta">${formatArabicDate(r.date)}</div>
+        ${sentMeta}
+        ${chips ? `<div class="chip-list">${chips}</div>` : ''}
+        ${r.text ? `<div class="rtext">${r.text}</div>` : ''}
+
+        <div class="report-actions">
+          <button class="btn-act" data-copy="${r.id}">📋 نسخ</button>
+          <button class="btn-act btn-act-whatsapp" data-whatsapp="${r.id}">📱 واتساب</button>
+          <button class="btn-act btn-act-danger" data-delete="${r.id}">🗑️ حذف</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  document.getElementById('main').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <span style="font-size:12px;color:var(--text-faint);">عدد التقارير: ${state.reports.length} | آخر تحديث: ${nowTimeString()}</span>
+      <button class="sync-btn" id="refreshHistory">🔄 تحديث</button>
+    </div>
+    ${pendingBadge}
+    ${html}
+  `;
+
+  bindHistoryTab();
+}
+
+function bindHistoryRefresh(){
+  const btn = document.getElementById('refreshHistory');
+  if(btn) btn.addEventListener('click', ()=> renderHistoryTab());
+}
+
+function bindHistoryTab(){
+  bindHistoryRefresh();
+
+  document.querySelectorAll('[data-copy]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.copy;
+      copyReportText(id);
+    });
+  });
+
+  document.querySelectorAll('[data-whatsapp]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.whatsapp;
+      sendReportToWhatsapp(id);
+    });
+  });
+
+  document.querySelectorAll('[data-delete]').forEach(btn=>{
+    btn.addEventListener('click', e=>{
+      const id = e.currentTarget.dataset.delete;
+      deleteReport(id);
+    });
+  });
+}
+
+function copyReportText(reportId){
+  const report = state.reports.find(r => r.id === reportId);
+  if(report){
+    const text = buildReportMessage(report);
+    navigator.clipboard.writeText(text).then(()=>{
+      showToast('تم نسخ نص التقرير');
+    }).catch(()=>{
+      showToast('فشل النسخ', 'warn');
+    });
+  }
+}
+
+function sendReportToWhatsapp(reportId){
+  const report = state.reports.find(r => r.id === reportId);
+  if(report){
+    const text = buildReportMessage(report);
+    const url = "https://wa.me/?text=" + encodeURIComponent(text);
+    window.open(url, '_blank');
+    showToast('تم فتح واتساب لإرسال التقرير');
+  }
+}
+
+async function deleteReport(reportId){
+  if(!confirm('هل أنت متأكد من رغبتك في حذف هذا التقرير؟')) return;
+
+  showToast('جاري الحذف…', 'warn');
+
+  // تسجيل الحذف في قائمة المزامنة
+  addPendingDelete(reportId);
+
+  // حذف التقرير من الذاكرة
+  state.reports = state.reports.filter(function(r){
+    return r.id !== reportId;
+  });
+
+  // حفظ الحذف محلياً فوراً
+  saveLocalReports();
+
+  // تحديث الشاشة مباشرة
+  await renderHistoryTab();
+
+  // محاولة حذف التقرير من Google Sheets
+  let ok = null;
+
+  if(navigator.onLine){
+    try{
+      ok = await postToCloud("deleteReport", { id: reportId });
+    }catch(e){
+      console.error("DELETE_REPORT_ERROR", e);
+      ok = null;
+    }
+  }
+
+  // إذا نجح الحذف في السحابة
+  if(ok && ok.status === "success"){
+
+    clearPendingDelete(reportId);
+
+    // التأكد من حفظ الحالة المحلية
+    saveLocalReports();
+
+    showToast('تم حذف التقرير من الهاتف وGoogle Sheets ✓');
+
+  }else{
+
+    // يبقى ID في pendingDeletes
+    // وسيتم حذفه تلقائياً عند عودة الإنترنت
+    savePendingDeletes();
+
+    showToast(
+      'تم حذف التقرير من الهاتف — سيتم حذفه من Google Sheets عند عودة الإنترنت',
+      'warn'
+    );
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   تبويب الإعدادات
+   ═══════════════════════════════════════════════ */
+
+function renderSettingsTab(){
+  if(!state.adminPin) return renderSetPinScreen();
+  if(!state.adminUnlocked) return renderLockScreen();
+  return renderSettingsEditor();
+}
+
+function renderSetPinScreen(){
+  return `
+    <div class="card">
+      <h2>🔒 تأمين الإعدادات</h2>
+      <div class="hint">عيّن رمز حماية جديد لحماية الإعدادات والمراكز على السحابة.</div>
+      <div class="row-gap" style="margin-top:12px;">
+        <label>رمز الحماية الجديد</label>
+        <input type="tel" id="newPinInput" placeholder="4 أرقام" maxlength="6">
+      </div>
+      <button class="btn-primary" id="setPinBtn">حفظ الرمز وتفعيل الإعدادات</button>
+    </div>
+  `;
+}
+
+function bindSetPinScreen(){
+  document.getElementById('setPinBtn').addEventListener('click', async ()=>{
+    const p1 = document.getElementById('newPinInput').value.trim();
+    if(p1.length < 4){ showToast('استخدم رمزاً من 4 أرقام على الأقل', 'warn'); return; }
+    state.adminPin = p1;
+    state.adminUnlocked = true;
+    await syncSettingsToCloud();
+    showToast('تم حفظ رمز الحماية سحابياً');
+    render();
+  });
+}
+
+function renderLockScreen(){
+  return `
+    <div class="card">
+      <h2>🔒 الإعدادات مؤمّنة</h2>
+      <div class="row-gap">
+        <label>رمز الحماية</label>
+        <input type="tel" id="pinInput" placeholder="أدخل الرمز" maxlength="6">
+      </div>
+      <button class="btn-primary" id="unlockBtn">دخول</button>
+    </div>
+  `;
+}
+
+function bindLockScreen(){
+  document.getElementById('unlockBtn').addEventListener('click', ()=>{
+    const val = document.getElementById('pinInput').value.trim();
+    if(val === state.adminPin){
+      state.adminUnlocked = true;
+      render();
+    } else {
+      showToast('رمز غير صحيح', 'danger');
+    }
+  });
+}
+
+function renderSettingsEditor(){
+  const centersHtml = state.centers.map(c=>`
+    <div class="settings-item">
+      <input type="text" data-center-name="${c.id}" value="${c.name}">
+      <button class="small-btn" data-remove-center="${c.id}">✕</button>
+    </div>
+  `).join('');
+
+  const supervisorsHtml = state.supervisors.map((s,i)=>`
+    <div class="settings-item">
+      <span class="chip">${i+1}</span>
+      <input type="text" data-sup-name="${s.id}" value="${s.name}">
+      <button class="small-btn" data-remove-sup="${s.id}">✕</button>
+    </div>
+  `).join('');
+
+  return `
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;">
+      <span style="font-size:12.5px;color:var(--text-secondary);">الإعدادات مفتوحة</span>
+      <button class="btn-ghost" id="lockNowBtn">🔒 قفل</button>
+    </div>
+
+    <div class="card">
+      <h2>مراكز الحراسة (${state.centers.length})</h2>
+      ${centersHtml}
+      <div class="add-row">
+        <input type="text" id="newCenterName" placeholder="اسم مركز جديد">
+        <button id="addCenterBtn">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>المسؤولون والدورة</h2>
+      ${supervisorsHtml}
+      <div class="add-row">
+        <input type="text" id="newSupName" placeholder="اسم مسؤول جديد">
+        <button id="addSupBtn">+</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>تاريخ بداية الدورة</h2>
+      <input type="date" id="rotationStartInput" value="${state.rotationStart}">
+    </div>
+  `;
+}
+
+function bindSettingsEditor(){
+  document.getElementById('lockNowBtn').addEventListener('click', ()=>{
+    state.adminUnlocked = false;
+    render();
+  });
+
+  document.querySelectorAll('[data-center-name]').forEach(inp=>{
+    inp.addEventListener('change', async e=>{
+      const c = state.centers.find(x=>x.id===e.target.dataset.centerName);
+      if(c){ c.name = e.target.value; await syncSettingsToCloud(); showToast('تم التحديث السحابي'); }
+    });
+  });
+
+  document.querySelectorAll('[data-remove-center]').forEach(btn=>{
+    btn.addEventListener('click', async e=>{
+      state.centers = state.centers.filter(c=>c.id!==e.target.dataset.removeCenter);
+      await syncSettingsToCloud(); render();
+    });
+  });
+
+  document.getElementById('addCenterBtn').addEventListener('click', async ()=>{
+    const inp = document.getElementById('newCenterName');
+    if(!inp.value.trim()) return;
+    state.centers.push({id:uid(), name: inp.value.trim()});
+    await syncSettingsToCloud(); render();
+  });
+
+  document.querySelectorAll('[data-sup-name]').forEach(inp=>{
+    inp.addEventListener('change', async e=>{
+      const s = state.supervisors.find(x=>x.id===e.target.dataset.supName);
+      if(s){ s.name = e.target.value; await syncSettingsToCloud(); showToast('تم التحديث'); }
+    });
+  });
+
+  document.querySelectorAll('[data-remove-sup]').forEach(btn=>{
+    btn.addEventListener('click', async e=>{
+      state.supervisors = state.supervisors.filter(s=>s.id!==e.target.dataset.removeSup);
+      await syncSettingsToCloud(); render();
+    });
+  });
+
+  document.getElementById('addSupBtn').addEventListener('click', async ()=>{
+    const inp = document.getElementById('newSupName');
+    if(!inp.value.trim()) return;
+    state.supervisors.push({id:uid(), name: inp.value.trim()});
+    await syncSettingsToCloud(); render();
+  });
+
+  document.getElementById('rotationStartInput').addEventListener('change', async e=>{
+    state.rotationStart = e.target.value;
+    await syncSettingsToCloud(); showToast('تم تحديث تاريخ الدورة');
+  });
+}
+
+function bindSettingsTab(){
+  if(!state.adminPin) return bindSetPinScreen();
+  if(!state.adminUnlocked) return bindLockScreen();
+  return bindSettingsEditor();
+}
+
+/* ═══════════════════════════════════════════════
+   مشاركة التقرير
+   ═══════════════════════════════════════════════ */
+
+function buildReportMessage(report){
+  const lines = [
+    '📋 تقرير الليالي',
+    'التاريخ: ' + formatArabicDate(report.date),
+    'المسؤول: ' + report.supervisor,
+    '',
+    'عدد الحضور:'
+  ];
+  report.centers.forEach(c=> lines.push('• ' + c.name + ': ' + c.count));
+  lines.push('', 'الإجمالي: ' + report.total);
+  if(report.sentDay || report.sentTime){
+    lines.push('', 'تم إرسال التقرير: ' + (report.sentDay || '') + (report.sentTime ? ' — الساعة ' + report.sentTime : ''));
+  }
+  if(report.text && report.text.trim()){
+    lines.push('', 'ملاحظات:', report.text.trim());
+  }
+  return lines.join('\n');
+}
+
+/* ═══════════════════════════════════════════════
+   التنقل والتهيئة
+   ═══════════════════════════════════════════════ */
+
+async function render(){
+  document.querySelectorAll('nav.tabs button').forEach(b=>{
+    b.classList.toggle('active', b.dataset.tab===state.activeTab);
+  });
+  if(state.activeTab==='report'){
+    document.getElementById('main').innerHTML = renderReportTab();
+    bindReportTab();
+  } else if(state.activeTab==='history'){
+    await renderHistoryTab();
+  } else if(state.activeTab==='settings'){
+    document.getElementById('main').innerHTML = renderSettingsTab();
+    bindSettingsTab();
+  }
+}
+
+document.querySelectorAll('nav.tabs button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    state.activeTab = btn.dataset.tab;
+    render();
+  });
+});
+
+(async function init(){
+  tickClock();
+  checkLocalStorage();
+
+  loadLocalReports();
+  loadPendingDeletes();
+  loadPendingSync();
+
+  if(navigator.onLine){
+    await autoSync();
+  }
+
+  state.draft.supervisor = getTodaysSupervisor();
+  render();
+
+  window.addEventListener('online', async function(){
+    await autoSync();
+    render();
+  });
+
+  window.addEventListener('offline', function(){
+    console.log('OFFLINE_MODE');
+  });
+
+  setInterval(async function(){
+    if(navigator.onLine){
+      await autoSync();
+    }
+  }, 60000);
+})();
+</script>
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function () {
+    navigator.serviceWorker.register('service-worker.js')
+      .then(function () {
+        console.log('Imkras PWA: Service Worker registered');
+      })
+      .catch(function (error) {
+        console.error('Imkras PWA: Service Worker error', error);
+      });
+  });
+}
+</script>
+</body>
+</html>
