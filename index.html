@@ -348,10 +348,51 @@
 const API_URL = "https://script.google.com/macros/s/AKfycbwVSL77s1GhIYnFLN2feso7y52pi9Pr6NfoCK-43VLF3x8Z1pwrVT6wThlYVeAKmqKkAA/exec";
 
 let state = {
-  centers: Array.from({length:14}, (_,i)=>({id: (i+1).toString(), name:'مركز '+(i+1)})),
-  supervisors: [],
-  rotationStart: todayISO(),
-  adminPin: null,
+  centers: [
+      {id:"1",name:"المسجد الكبير"},
+      {id:"2",name:"مسجد الضياء (إنورار)"},
+      {id:"3",name:"مسجد التقوى"},
+      {id:"4",name:"مسجد الاحسان (السحن)"},
+      {id:"5",name:"حي الحاج مسعود"},
+      {id:"6",name:"مسجد الرضوان (الشيخ بلحاج)"},
+      {id:"7",name:"حي المنظر الجميل"},
+      {id:"8",name:"مصلي الرياحين"},
+      {id:"9",name:"مسجد السلام"},
+      {id:"10",name:"برج بابهون"},
+      {id:"11",name:"حي العقيد لطفي"},
+      {id:"12",name:"برج الشيخ الدبوز"},
+      {id:"13",name:"برج بوقرطاس"},
+      {id:"14",name:"مسجد الفرقان (المؤذن)"},
+      {id:"15",name:"أغرم اجديد"},
+      {id:"16",name:"مصلي تيديوت"},
+      {id:"17",name:"مصلي إجنوان"},
+      {id:"18",name:"حي إوريرن"},
+      {id:"19",name:"حي إتران"},
+      {id:"20",name:"حي تازيري"},
+      {id:"21",name:"حي تيفاوت / أسيرم"},
+      {id:"22",name:"مصلى الهناء"},
+      {id:"23",name:"مسجد الحمد /الشيحية"},
+      {id:"24",name:"كودية الشوف /سيدي بلخير"},
+      {id:"25",name:"حي السحن الجديد"}
+    ],
+  supervisors: [
+      {id:"s1",name:"الأحد 01 بولدون الناصر"},
+      {id:"s2",name:"الإثنين 02 سليمان بوعصبانه صالح"},
+      {id:"s3",name:"الثلاتاء 03 بوقرطاس بكير"},
+      {id:"s4",name:"الإربعاء 04 مجاهد عبد الحميد"},
+      {id:"s5",name:"الخميس 05 العايب الحاج"},
+      {id:"s6",name:"الجمعة 06 كفوس إسماعيل"},
+      {id:"s7",name:"السبت 07 بوراس عبد الحميد"},
+      {id:"s8",name:"الأحد 08 الدوادي حموده"},
+      {id:"s9",name:"الإثنين 09 عبد الاوي مرموري الحاج"},
+      {id:"s10",name:"الثلاتاء 10 كريزو حمزه"},
+      {id:"s11",name:"الإربعاء 11 مرزوق إبراهيم"},
+      {id:"s12",name:"الخميس 12 بسيس سعيد"},
+      {id:"s13",name:"الجمعه 13 حمدي عيسى عمر"},
+      {id:"s14",name:"السبت 14 حاجي محمد"}
+    ],
+  rotationStart: "2026-09-06",
+  adminPin: "1234",
   adminUnlocked: false,
   reports: [],
   activeTab: 'report',
@@ -389,6 +430,38 @@ function loadLocalReports(){
     console.error('LOCAL_REPORTS_LOAD_ERROR', e);
   }
 }
+
+function saveLocalSettings(){
+  if(!state.lsAvailable) return;
+  try {
+    localStorage.setItem('settings_v1', JSON.stringify({
+      centers: state.centers,
+      supervisors: state.supervisors,
+      rotationStart: state.rotationStart,
+      adminPin: state.adminPin
+    }));
+  } catch(e) {
+    console.error('LOCAL_SETTINGS_SAVE_ERROR', e);
+  }
+}
+
+function loadLocalSettings(){
+  if(!state.lsAvailable) return;
+  try {
+    const raw = localStorage.getItem('settings_v1');
+    if(raw){
+      const data = JSON.parse(raw);
+      if(data.centers && data.centers.length > 0) state.centers = data.centers;
+      if(data.supervisors && data.supervisors.length > 0) state.supervisors = data.supervisors;
+      if(data.rotationStart) state.rotationStart = data.rotationStart;
+      if(data.adminPin) state.adminPin = data.adminPin;
+    }
+  } catch(e) {
+    console.error('LOCAL_SETTINGS_LOAD_ERROR', e);
+  }
+}
+
+
 
 function savePendingSync(){
   if(!state.lsAvailable) return;
@@ -648,6 +721,7 @@ async function syncFromCloud(){
       if(data.settings.supervisors) state.supervisors = data.settings.supervisors;
       if(data.settings.rotationStart) state.rotationStart = data.settings.rotationStart;
       if(data.settings.adminPin) state.adminPin = data.settings.adminPin;
+      saveLocalSettings();
     }
 
     if(data.reports){
@@ -1336,6 +1410,7 @@ document.querySelectorAll('nav.tabs button').forEach(btn=>{
   tickClock();
   checkLocalStorage();
 
+  loadLocalSettings();
   loadLocalReports();
   loadPendingDeletes();
   loadPendingSync();
