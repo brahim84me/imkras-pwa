@@ -540,7 +540,9 @@ async function syncPendingOperations(){
           });
 
           if(report){
-            if(result.sentDate) report.date = result.sentDate;
+            // ملاحظة: لا نستبدل report.date هنا أبداً — يجب أن يبقى التاريخ
+            // هو التاريخ الذي اختاره المستخدم في النموذج، وليس تاريخ الخادم.
+            if(result.sentDate) report.sentDate = result.sentDate;
             if(result.sentDay) report.sentDay = result.sentDay;
             if(result.sentTime) report.sentTime = result.sentTime;
             saveLocalReports();
@@ -633,6 +635,15 @@ function nowTimeString(){
   return `${h}:${min}:${s}`;
 }
 
+// تنسيق تاريخ التقرير بصيغة موحّدة: "السبت 5.9.2026"
+function formatReportDateLine(iso){
+  if(!iso) return '';
+  const d = new Date(iso + 'T12:00:00');
+  if(isNaN(d.getTime())) return iso;
+  const dayName = d.toLocaleDateString('ar-EG-u-nu-latn',{weekday:'long'});
+  return dayName + ' ' + d.getDate() + '.' + (d.getMonth()+1) + '.' + d.getFullYear();
+}
+
 function formatArabicDate(iso){
   if(!iso) return '';
   const d = new Date(iso + 'T12:00:00');
@@ -673,9 +684,30 @@ function sanitizeReport(r){
   return {
     ...r,
     date: normalizeDate(r.date),
+    sentDate: normalizeDate(r.sentDate),
     sentTime: isPlainTimeString(r.sentTime) ? r.sentTime : undefined,
     sentDay: isPlainDayString(r.sentDay) ? r.sentDay : undefined
   };
+}
+
+// تنسيق يوم/تاريخ/وقت الإرسال بصيغة: "الخميس 10.9.2026 الساعة 14:05:00"
+function formatSentMeta(report){
+  if(!report) return '';
+  const parts = [];
+  if(report.sentDay) parts.push(report.sentDay);
+  if(report.sentDate){
+    const d = new Date(report.sentDate + 'T12:00:00');
+    if(!isNaN(d.getTime())){
+      parts.push(d.getDate() + '.' + (d.getMonth()+1) + '.' + d.getFullYear());
+    } else {
+      parts.push(report.sentDate);
+    }
+  }
+  let str = parts.join(' ');
+  if(report.sentTime){
+    str += (str ? ' ' : '') + 'الساعة ' + report.sentTime;
+  }
+  return str;
 }
 
 function showToast(msg, type='success'){
@@ -925,18 +957,18 @@ function getReportFromDraft(){
   }));
   const total = centersData.reduce((s,c)=>s+c.count,0);
 
-  // لحظة الإرسال الفعلية من جهاز المستخدم.
-  // نحفظ التاريخ والوقت فقط، بدون Unix timestamp رقمي.
+  // لحظة الإرسال الفعلية من جهاز المستخدم (تُستخدم فقط لتوقيت الإرسال sentTime/sentDay).
+  // التاريخ المعروض في التقرير (date) يبقى هو التاريخ الذي اختاره المستخدم في النموذج.
   const sentAt = new Date();
-  const sentDate = todayISO();
 
   return {
     id: uid(),
-    date: sentDate,
+    date: state.draft.date,
     supervisor: state.draft.supervisor,
     centers: centersData,
     total,
     text: state.draft.text.trim(),
+    sentDate: todayISO(),
     sentTime: sentAt.toLocaleTimeString('ar-EG-u-nu-latn',{
       hour:'2-digit', minute:'2-digit', second:'2-digit', hour12:false
     }),
@@ -1048,16 +1080,15 @@ async function renderHistoryTab(){
 
   const html = reportsSorted.map(r=>{
     const chips = (r.centers||[]).filter(c=>c.count>0).map(c=>`<span class="chip"><b>${c.count}</b> ${c.name}</span>`).join('');
-    const sentMeta = (r.sentDay || r.sentTime)
-      ? `<div class="rmeta">⏱️ أُرسل يوم ${r.sentDay || ''}${r.sentTime ? ' — الساعة ' + r.sentTime : ''}</div>`
+    const sentMeta = (r.sentDay || r.sentTime || r.sentDate)
+      ? `<div class="rmeta">⏱️ أُرسل: ${formatSentMeta(r)}</div>`
       : '';
     return `
       <div class="report-item" data-report-id="${r.id}">
         <div class="rh">
-          <span class="rdate">${r.date}</span>
+          <span class="rdate">${formatReportDateLine(r.date)}</span>
         </div>
         <div class="rsup">${r.supervisor} — إجمالي ${r.total}</div>
-        <div class="rmeta">${formatArabicDate(r.date)}</div>
         ${sentMeta}
         ${chips ? `<div class="chip-list">${chips}</div>` : ''}
         ${r.text ? `<div class="rtext">${r.text}</div>` : ''}
@@ -1371,8 +1402,8 @@ function buildReportMessage(report){
   ];
   report.centers.forEach(c=> lines.push('• ' + c.name + ': ' + c.count));
   lines.push('', 'الإجمالي: ' + report.total);
-  if(report.sentDay || report.sentTime){
-    lines.push('', 'تم إرسال التقرير: ' + (report.sentDay || '') + (report.sentTime ? ' — الساعة ' + report.sentTime : ''));
+  if(report.sentDay || report.sentTime || report.sentDate){
+    lines.push('', 'تم إرسال التقرير: ' + formatSentMeta(report));
   }
   if(report.text && report.text.trim()){
     lines.push('', 'ملاحظات:', report.text.trim());
